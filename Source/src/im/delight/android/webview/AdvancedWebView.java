@@ -16,59 +16,64 @@ package im.delight.android.webview;
  * limitations under the License.
  */
 
-import android.view.ViewGroup;
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.DownloadManager;
 import android.app.DownloadManager.Request;
-import android.os.Environment;
-import android.webkit.CookieManager;
-import java.util.Arrays;
+import android.app.Fragment;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import java.util.HashMap;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.net.http.SslError;
+import android.os.Build;
+import android.os.Environment;
+import android.os.Message;
+import android.os.Parcelable;
+import android.util.AttributeSet;
+import android.util.Base64;
 import android.view.InputEvent;
 import android.view.KeyEvent;
-import android.webkit.ClientCertRequest;
-import android.webkit.HttpAuthHandler;
-import android.webkit.SslErrorHandler;
-import android.webkit.WebResourceRequest;
-import android.webkit.WebResourceResponse;
-import android.os.Message;
 import android.view.View;
+import android.view.ViewGroup;
+import android.webkit.ClientCertRequest;
 import android.webkit.ConsoleMessage;
+import android.webkit.CookieManager;
+import android.webkit.DownloadListener;
 import android.webkit.GeolocationPermissions.Callback;
+import android.webkit.HttpAuthHandler;
 import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
 import android.webkit.PermissionRequest;
-import android.webkit.WebStorage.QuotaUpdater;
-import android.app.Fragment;
-import android.util.Base64;
-import android.os.Build;
-import android.webkit.DownloadListener;
-import android.graphics.Bitmap;
-import android.app.Activity;
-import android.content.Intent;
-import android.net.Uri;
+import android.webkit.SslErrorHandler;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
-import android.webkit.WebViewClient;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.util.AttributeSet;
+import android.webkit.WebStorage.QuotaUpdater;
 import android.webkit.WebView;
-import java.util.MissingResourceException;
-import java.util.Locale;
-import java.util.LinkedList;
-import java.util.Collection;
-import java.util.List;
+import android.webkit.WebViewClient;
+
 import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.MissingResourceException;
 
 /** Advanced WebView component for Android that works as intended out of the box */
 @SuppressWarnings("deprecation")
 public class AdvancedWebView extends WebView {
+
+	private String allowedFileUploads = "*/*";
+	private Parcelable[] extraIntents = null;
 
 	public static interface Listener {
 		public void onPageStarted(String url, Bitmap favicon);
@@ -149,6 +154,11 @@ public class AdvancedWebView extends WebView {
 	protected void setListener(final Listener listener, final int requestCodeFilePicker) {
 		mListener = listener;
 		mRequestCodeFilePicker = requestCodeFilePicker;
+	}
+
+	public void setAllowedUploads(String type, Parcelable[] extraIntents) {
+		this.allowedFileUploads = type;
+		this.extraIntents = extraIntents;
 	}
 
 	@Override
@@ -1013,7 +1023,7 @@ public class AdvancedWebView extends WebView {
 			else if (mLanguageIso3.equals("rus")) return decodeBase64("0JLRi9Cx0LXRgNC40YLQtSDQvtC00LjQvSDRhNCw0LnQuw==");
 			else if (mLanguageIso3.equals("jpn")) return decodeBase64("MeODleOCoeOCpOODq+OCkumBuOaKnuOBl+OBpuOBj+OBoOOBleOBhA==");
 			else if (mLanguageIso3.equals("pan")) return decodeBase64("4KiH4Kmx4KiVIOCoq+CovuCoh+CosiDgqJrgqYHgqKPgqYs=");
-			else if (mLanguageIso3.equals("deu")) return "Wähle eine Datei";
+			else if (mLanguageIso3.equals("deu")) return "WÃ¤hle eine Datei";
 			else if (mLanguageIso3.equals("jav")) return "Pilih siji berkas";
 			else if (mLanguageIso3.equals("msa")) return "Pilih satu fail";
 			else if (mLanguageIso3.equals("tel")) return decodeBase64("4LCS4LCVIOCwq+CxhuCxluCwsuCxjeCwqOCxgSDgsI7gsILgsJrgsYHgsJXgsYvgsILgsKHgsL8=");
@@ -1024,7 +1034,7 @@ public class AdvancedWebView extends WebView {
 			else if (mLanguageIso3.equals("tam")) return decodeBase64("4K6S4K6w4K+BIOCuleCvh+CuvuCuquCvjeCuquCviCDgrqTgr4fgrrDgr43grrXgr4E=");
 			else if (mLanguageIso3.equals("urd")) return decodeBase64("2KfbjNqpINmB2KfYptmEINmF24zauiDYs9uSINin2YbYqtiu2KfYqCDaqdix24zaug==");
 			else if (mLanguageIso3.equals("fas")) return decodeBase64("2LHYpyDYp9mG2KrYrtin2Kgg2qnZhtuM2K8g24zaqSDZgdin24zZhA==");
-			else if (mLanguageIso3.equals("tur")) return "Bir dosya seçin";
+			else if (mLanguageIso3.equals("tur")) return "Bir dosya seÃ§in";
 			else if (mLanguageIso3.equals("ita")) return "Scegli un file";
 			else if (mLanguageIso3.equals("tha")) return decodeBase64("4LmA4Lil4Li34Lit4LiB4LmE4Lif4Lil4LmM4Lir4LiZ4Li24LmI4LiH");
 			else if (mLanguageIso3.equals("guj")) return decodeBase64("4KqP4KqVIOCqq+CqvuCqh+CqsuCqqOCrhyDgqqrgqrjgqoLgqqY=");
@@ -1054,13 +1064,18 @@ public class AdvancedWebView extends WebView {
 
 		Intent i = new Intent(Intent.ACTION_GET_CONTENT);
 		i.addCategory(Intent.CATEGORY_OPENABLE);
-		i.setType("*/*");
+		i.setType(allowedFileUploads);
+
+		final Intent chooser = Intent.createChooser(i, getFileUploadPromptLabel());
+		if (extraIntents != null) {
+			chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, extraIntents);
+		}
 
 		if (mFragment != null && mFragment.get() != null && Build.VERSION.SDK_INT >= 11) {
-			mFragment.get().startActivityForResult(Intent.createChooser(i, getFileUploadPromptLabel()), mRequestCodeFilePicker);
+			mFragment.get().startActivityForResult(chooser, mRequestCodeFilePicker);
 		}
 		else if (mActivity != null && mActivity.get() != null) {
-			mActivity.get().startActivityForResult(Intent.createChooser(i, getFileUploadPromptLabel()), mRequestCodeFilePicker);
+			mActivity.get().startActivityForResult(chooser, mRequestCodeFilePicker);
 		}
 	}
 
